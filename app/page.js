@@ -1,4 +1,4 @@
-'use client'
+
 import getStripe from "@/utils/get-stripe";
 import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs'
 import { AppBar, Box, Button, Container, Grid, Toolbar, Typography } from "@mui/material";
@@ -18,8 +18,8 @@ export default function Home() {
         <Toolbar >
           <Typography variant="h6" style={{ flexGrow: 1 }}>Flashcard Saas</Typography>
           <SignedOut>
-            <Button color="inherit">Login</Button>
-            <Button color="inherit">signup</Button>
+            <Button color="inherit" href="/sign-in">Login</Button>
+            <Button color="inherit" href="/sign-up">signup</Button>
           </SignedOut>
           <SignedIn>
             <UserButton />
