@@ -2,7 +2,7 @@
 
 import getStripe from "@/utils/get-stripe";
 import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs'
-import { AppBar, Box, Button, CircularProgress, Container, Grid, styled, Toolbar, Typography } from "@mui/material";
+import { AppBar, Box, Button, CircularProgress, Container, Grid, Stack, styled, Toolbar, Typography } from "@mui/material";
 import Head from "next/head";
 import { useRouter } from "next/navigation";
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v13-appRouter'
@@ -19,10 +19,11 @@ export default function Home() {
   const [loading1, setLoading1] = useState(false)
   const [loading2, setLoading2] = useState(false)
   const [loading3, setLoading3] = useState(false)
+  const [loading4, setLoading4] = useState(false)
 
 
   const handlesubmit = async (plan) => {
-    plan === 'basic' ? setLoading2(true) : setLoading3(true)
+    plan === 'basic' ? setLoading3(true) : setLoading4(true)
     const checkoutSession = await fetch('/api/checkout_session', {
       method: 'POST',
       headers: {
@@ -51,6 +52,11 @@ export default function Home() {
   const handleGetStarted = () => {
     setLoading1(true)
     router.push('./generate')
+  }
+
+  const showGenerated = () => {
+    setLoading2(true)
+    router.push('/flashcards')
   }
 
   return (
@@ -83,7 +89,10 @@ export default function Home() {
               Welcome to Flashcard SaaS
             </Typography>
             <Typography variant="h4">The easiest way to make flashcards</Typography>
-            {loading1 ? (<GradientCircularProgress />) : ( <Button variant="contained" sx={{ mt: 2 }} onClick={handleGetStarted} >Get started</Button> )}
+            <Stack justifyContent={'center'} display='flex' flexDirection='row' gap={1} sx={{ my: 2 }} >
+              {loading1 ? (<GradientCircularProgress />) : ( <Button variant="contained"  onClick={handleGetStarted} >Create Collection</Button> )}
+              {loading2 ? (<GradientCircularProgress />) : ( <Button variant="contained" color="secondary"  onClick={showGenerated} >View Collections</Button> )}
+            </Stack>
             
             
           </Box>
@@ -121,7 +130,7 @@ export default function Home() {
                   <Typography variant="h5" gutterBottom>Basic</Typography>
                   <Typography variant="h6" gutterBottom>$5/month</Typography>
                   <Typography >Acces to basic flashcard features and limited storage</Typography>
-                  {loading2 ? (<GradientCircularProgress />) : (<Button variant="contained" sx={{ mt: 1 }} onClick={() => handlesubmit('basic')}>Choose basic</Button>) }
+                  {loading3 ? (<GradientCircularProgress />) : (<Button variant="contained" sx={{ mt: 1 }} onClick={() => handlesubmit('basic')}>Choose basic</Button>) }
                 </Box>
               </Grid>
               
@@ -135,7 +144,7 @@ export default function Home() {
                   <Typography variant="h5" gutterBottom>Pro</Typography>
                   <Typography variant="h6" gutterBottom>$10/month</Typography>
                   <Typography >Unlimited flashcards with storage, priority support</Typography>
-                  {loading3 ? (<GradientCircularProgress />) : (<Button variant="contained" sx={{ mt: 1 }} onClick={() => handlesubmit('pro')}>Choose Pro</Button>) }
+                  {loading4 ? (<GradientCircularProgress />) : (<Button variant="contained" sx={{ mt: 1 }} onClick={() => handlesubmit('pro')}>Choose Pro</Button>) }
                   
                 </Box>
               </Grid>

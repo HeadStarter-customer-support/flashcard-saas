@@ -1,7 +1,5 @@
 'use client'
 
-
-import getStripe from "@/utils/get-stripe"
 import { Box, CircularProgress, Container, Typography } from "@mui/material"
 import { useSearchParams } from "next/navigation"
 import { useRouter } from "next/navigation"
@@ -54,6 +52,8 @@ const ResultPage = () => {
     }
 
     if (error) {
+        console.log(error);
+        
         return (
             <Container maxWidth="100vw" sx={{
                 textAlign: 'center',

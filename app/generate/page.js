@@ -1,28 +1,42 @@
 'use client'
 
 import { db } from "@/firebase"
-import { useUser } from "@clerk/nextjs"
-import { Box, Button, Card, CardActionArea, CardContent, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, Paper, TextField, Typography } from "@mui/material"
+import { SignedIn, SignedOut, UserButton, useUser } from "@clerk/nextjs"
+import { HomeRounded } from "@mui/icons-material"
+import { AppBar, Backdrop, Box, Button, Card, CardActionArea, CardContent, CircularProgress, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, Paper, styled, TextField, Toolbar, Typography } from "@mui/material"
 import { collection, getDoc, writeBatch, doc } from "firebase/firestore"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
+import GradientCircularProgress from "../components/gradientcircularprogress"
+GradientCircularProgress
+const Offset = styled('div')(({ theme }) => theme.mixins.toolbar)
+
 
 export default function Generate() {
+    
     const {isLoaded, isSignedIn, user} = useUser()
     const [flashcards, setFlashcards] = useState([])
     const [flipped, setFlipped] = useState('')
     const [text, setText] = useState('')
     const [name, setName] = useState('')
     const [open, setOpen] = useState(false)
+    const [openProgress, setOpenProgress] = useState(false)
     const router = useRouter()
 
     const handleSubmit = async () => {
+        setOpenProgress(true)
         fetch('/api/generate', {
             method: 'POST',
             body: text,
         })
             .then((res) => res.json())
-            .then(data => setFlashcards(data))
+            .then(data => {
+                setFlashcards(data)
+                setOpenProgress(false)
+            })
+            .catch(() => setOpenProgress(false))
+            
+        
     }
 
     const handleCardClick = (id) => {
@@ -30,6 +44,11 @@ export default function Generate() {
             ...prev,
             [id]: !prev[id],
         }))
+    }
+    
+    const handleClick = () => {
+        setOpen(true)
+        router.push('/')
     }
 
     const handleOpen = () => {
@@ -51,16 +70,16 @@ export default function Generate() {
         const docSnap = await getDoc(userDocRef)
 
         if (docSnap.exists()) {
-            const collections = docSnap.data().flashCards || []
+            const collections = docSnap.data().flashcards || []
             if (collections.find((f) => f.name === name)) {
                 alert(`Flashcard with name ${name} already exists.`)
                 return
             } else {
                 collections.push({name})
-                batch.set(userDocRef, {flashcards: collections}, {merge: true})
+                batch.set(userDocRef, { flashcards: collections }, { merge: true })
             }
         } else {
-            batch.set(userDocRef, {flashcards: [{name}]})
+            batch.set(userDocRef, { flashcards: [{ name }] })
         }
 
         const colRef = collection(userDocRef, name)
@@ -76,6 +95,25 @@ export default function Generate() {
 
     return (
         <Container maxWidth="md">
+
+            <Backdrop sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }} open={openProgress} >
+            <GradientCircularProgress color="inherit" />
+            </Backdrop>
+
+            <AppBar>
+                <Toolbar variant="dense">
+                <Typography sx={{ mt:1 }} variant="h6" style={{ flexGrow: 1 }}><HomeRounded onClick={handleClick} /></Typography>
+                <SignedOut>
+                    <Button color="inherit" href="/sign-in">Login</Button>
+                    <Button color="inherit" href="/sign-up">signup</Button>
+                </SignedOut>
+                <SignedIn>
+                    <UserButton />
+                </SignedIn>
+                    
+                </Toolbar>
+            </AppBar>
+
             <Box
                 sx={{
                     mt: 4,
@@ -85,7 +123,9 @@ export default function Generate() {
                     alignItems: 'center'
                 }}
             >
-                <Typography variant="h4">Generate Flashcards</Typography>
+                <Offset />
+                <Typography paddingBottom={2} variant="h4">Generate Flashcards</Typography>
+                
                 <Paper sx={{ p:4, width: '100%' }}>
                     <TextField 
                         value={text}
@@ -163,7 +203,7 @@ export default function Generate() {
                         display: 'flex',
                         justifyContent: 'center',
                     }} >
-                        <Button variant="contained" color="secondary" onClick={handleOpen}>
+                        <Button sx={{ my:2 }} variant="contained" color="secondary" onClick={handleOpen}>
                             Save
                         </Button>
                     </Box>
@@ -181,7 +221,6 @@ export default function Generate() {
                 <DialogActions>
                     <Button onClick={handleClose} >Cancel</Button>
                     <Button onClick={saveFlashcards} >Save</Button>
-
                 </DialogActions>
             </Dialog>
         </Container>
