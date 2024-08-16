@@ -1,26 +1,25 @@
+'use client'
 import { SignIn } from "@clerk/nextjs";
-import { AppBar, Box, Button, Container, Toolbar, Typography } from "@mui/material";
+import { AppBar, Box, Button, Container, styled, Toolbar, Typography } from "@mui/material";
 import Link from "next/link";
+const Offset = styled('div')(({ theme }) => theme.mixins.toolbar)
+
 
 export default function SignInPage() {
     return (
         <Container maxWidth="sm">
-            <AppBar position="static" sx={{ backgroundColor: '#3f51b5' }}>
+            <AppBar sx={{ backgroundColor: '#3f51b5' }} elevation={0}>
                 <Toolbar>
                     <Typography variant="h6" sx={{
                         flexGrow: 1
                     }}>
-                        Flashcard SaaS
+                        <Link href="/" passHref>Flashcard SaaS</Link>
                     </Typography>
                     <Button color="inherit">
-                        <Link href='/sign-in' passHref>
-                            Login
-                        </Link>
+                        <Link href='/sign-in' passHref> Login </Link>
                     </Button>
                     <Button color="inherit">
-                        <Link href='/sign-up' passHref>
-                            Signup
-                        </Link>
+                        <Link href='/sign-up' passHref> Signup </Link>
                     </Button>
                 </Toolbar>
             </AppBar>
@@ -30,8 +29,10 @@ export default function SignInPage() {
                 flexDirection={"column"}
                 alignItems={"center"}
                 justifyContent={"center"}
+                padding={3}
             >
-                <Typography variant="h6">Sign In</Typography>
+                <Offset />
+                {/* <Typography variant="h6">Sign In</Typography> */}
                 <SignIn/>
             </Box>
         </Container>
